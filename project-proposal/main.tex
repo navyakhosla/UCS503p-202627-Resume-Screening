@@ -4,24 +4,24 @@
 \usepackage{enumitem}
 \usepackage{graphicx}
 \usepackage{xcolor}
+\usepackage{titling}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{url}
 
 % -----------------------------------------------------
-% bvraghav-tiet-ucs503p-article.sty
+% Adapted from the provided UCS503P project-proposal template.
+% Project basis: https://github.com/Abhinandan9292/Resume-Screening-API
 % -----------------------------------------------------
 
 % Variable: Lab Instructor
 \makeatletter \newcommand{\BvrSetLabInstructor}[1]{%
   \gdef\Bvr@LabInstructor{#1}}
-% default
-\newcommand{\Bvr@LabInstructor}{Dr. Raghav %
-  B. Venkataramaiyer}
-% public accessor
+\newcommand{\Bvr@LabInstructor}{Dr. Raghav B. Venkataramaiyer}
 \newcommand{\BvrLabInstructorValue}{\Bvr@LabInstructor}
 \makeatother
 
-% Add subtitle
-\usepackage{titling}
-% -- Set title bold
 \pretitle{\begin{center}\bfseries\fontsize{18bp}{18bp}\selectfont}
 \makeatletter
 \newcommand{\BvrSubtitle}[1]{%
@@ -32,30 +32,24 @@
 }
 \makeatother
 
-% Hints in the section title(s)
 \newcommand{\BvrHint}[1]{%
   {\normalfont\normalsize\itshape\hfill #1}}
 
-% -----------------------------------------------------
+\title{Resume Screening and Campus Placement Management API}
 
-\title{Grievance-Resolution System for a Tier-2/3 City}
-
-\BvrSetLabInstructor{Dr. Raghav B. Venkataramaiyer}
+\BvrSetLabInstructor{Paramveer Kaur}
 
 \BvrSubtitle{%
   Project Proposal for UCS503P  \\
   Submitted to: \BvrLabInstructorValue \\ \bfseries
-  Thapar Institute of Engineering and Technology% 
+  Thapar Institute of Engineering and Technology%
 }
-
-\author{
-  Vidya Vaidyanathan, CSED%
-  \thanks{Roll No: \texttt{1024030xxx}, %
-    Email: \texttt{vvaidhanathan\_be24\@thapar.edu}}
-  \and 
-  Bhanurekha Ganesan, CSED%
-  \thanks{Roll No: \texttt{1024030xxx}, %
-    Email: \texttt{bganesan\_be24\@thapar.edu}}
+\author{%
+  \vspace{-1.2cm} % <--- This negative space pulls the names up. You can adjust it (e.g., -1.0cm or -1.5cm) if needed.
+  \begin{tabular}{>{\centering\arraybackslash}p{0.3\textwidth} >{\centering\arraybackslash}p{0.3\textwidth} >{\centering\arraybackslash}p{0.3\textwidth}}
+    Kanika Sahni & Navya Khosla & Abhinandan Wadhwa \\
+    \small Roll No: 1024030031 & \small Roll No: 1024030029 & \small Roll No: 1024030026
+  \end{tabular}
 }
 
 \date{\today}
@@ -63,180 +57,181 @@
 \begin{document}
 \maketitle
 
-\section{Higher-order goal%
-  \BvrHint{\ldots secondary framing}}
-This project aims to improve sustainable urban
-governance by reducing the time and effort required to
-resolve citizen issues. While the topic is broader than
-any single municipality, the immediate engineering
-objective is to translate \emph{efficient public
-  service delivery} into a measurable, deployable
-software solution.
+\section{Higher-order goal\BvrHint{\ldots secondary framing}}
+This project aims to streamline campus placement operations by connecting student profile creation, resume-based data extraction, recruiter job management, candidate discovery, applications, and placement-office administration in one web-based system. The engineering objective is to reduce manual data entry and scattered recruitment workflows while keeping candidate information searchable, persistent, and usable by different stakeholders.
 
-\section{Time-to-value %
-\BvrHint{\ldots primary heuristic}}
+The implementation studied as a foundation for this proposal is the public repository \href{https://github.com/Abhinandan9292/Resume-Screening-API}{Resume-Screening-API}. Its current structure contains a FastAPI backend, HTML/CSS interfaces for student, recruiter, and administrator roles, and a PostgreSQL/Supabase-backed data layer.
+
+\section{Time-to-value\BvrHint{\ldots primary heuristic}}
 \begin{itemize}[leftmargin=0.7cm]
-    \item We will deliver meaningful increments quickly by prototyping the core user workflow and validating it with users within a short iteration window.
-    \item We will prioritize fast feedback over perfection by using weekly iterations (and targeting CI-backed automation early) to reduce release friction.
-    \item Success is defined by what can be delivered and measured in the first iteration, then improved based on user feedback.
+    \item The proposed system will provide immediate value at student onboarding by accepting a PDF resume and extracting a draft skills list and short text preview.
+    \item Recruiters will be able to move directly from role creation to candidate search and applicant review without maintaining separate spreadsheets or manually collecting profiles.
+    \item The placement office will gain a centralized view of student placement status, recruiter activity, recruitment statistics, and recent audit activity.
+    \item Incremental delivery will be practical because the application will be exposed as REST-style API endpoints consumed by lightweight web pages.
 \end{itemize}
 
 \section{Problem Statement}
-Citizens in a tier-2/3 Indian city face delays and uncertainty when reporting local issues (e.g., streetlight outages, water leakage, garbage accumulation, road potholes). Common pain points include:
+Campus placement processes often distribute student data, job openings, applications, and recruiter communication across unrelated forms, spreadsheets, and portals. This creates several operational problems:
 \begin{itemize}[leftmargin=0.7cm]
-    \item \textbf{Fragmentation:} complaints are often made via multiple channels (calls, social media, paper forms), causing lost context.
-    \item \textbf{Low transparency:} citizens cannot easily see the status of their complaint (e.g., ``received'', ``assigned'', ``in progress'', ``resolved'').
-    \item \textbf{Slow coordination:} departments/field teams lack a unified, trackable workflow with clear ownership.
-    \item \textbf{Poor data quality:} duplicate or incomplete reports force rework and extend resolution time.
+    \item \textbf{Manual profile entry:} students repeatedly enter skills and summary information that already exists in their resumes.
+    \item \textbf{Fragmented candidate discovery:} recruiters need a searchable view of active candidates rather than manually scanning every student profile.
+    \item \textbf{Disconnected application tracking:} job postings and student applications need a common source of truth.
+    \item \textbf{Limited administrative visibility:} placement teams need current counts, recruiter activity, and student placement status in one dashboard.
+    \item \textbf{Data consistency:} skills should be stored in a normalized way so that multiple students can be searched and matched against the same skill vocabulary.
 \end{itemize}
 
-\textbf{Why this matters now (contextual relevance):} In an urban setting with limited staff bandwidth, even small process improvements can noticeably reduce resolution delays and repeated submissions.
-
-\section{Proposed Solution %
-\BvrHint{\ldots Software Proposition}}
+\section{Proposed Solution\BvrHint{\ldots Software Proposition}}
 \subsection{Overview}
-Build a \textbf{web-based} ``Grievance-to-Resolution'' system with the following components:
+We propose to build a \textbf{web-based campus placement platform} with resume-assisted profile creation and role-specific workflows:
 \begin{itemize}[leftmargin=0.7cm]
-    \item \textbf{Citizen submission portal:} users submit an issue with photo (optional), category, and locality/ward.
-    \item \textbf{Automated triage:} basic duplicate detection and completeness checks.
-    \item \textbf{Department workflow:} assign issues to relevant department/team and update statuses.
-    \item \textbf{Status transparency:} citizens track status and receive notifications when resolved.
-    \item \textbf{Admin/ops dashboard:} performance summaries (resolution time, backlog).
+    \item \textbf{Resume parsing API:} accept a PDF, extract text with PyMuPDF, scan for a predefined set of technical keywords, and return a suggested skills string plus a short bio preview.
+    \item \textbf{Student portal:} allow students to register, log in, view profile information, edit CGPA and skills, browse jobs, and submit applications.
+    \item \textbf{Recruiter portal:} enable recruiters to authenticate with corporate credentials, publish jobs, view applicants for their roles, export applicant data, and search active candidates by skills.
+    \item \textbf{Placement administration:} provide tools to manage recruiter accounts, inspect student records, mark students as placed, monitor recruitment statistics, and view recent audit logs.
+    \item \textbf{Relational data layer:} persist students, skills, student-skill relationships, jobs, applications, recruiters, and placement/audit information in PostgreSQL.
 \end{itemize}
 
 \subsection{Core workflow}
 \begin{enumerate}[leftmargin=0.7cm]
-    \item Citizen creates a complaint and receives a complaint ID immediately.
-    \item System validates completeness and suggests possible duplicates (lightweight similarity on text/category and approximate location).
-    \item Department staff update status (Received $\rightarrow$ Assigned $\rightarrow$ In Progress $\rightarrow$ Resolved).
-    \item Citizen views status updates and resolution notes.
+    \item A student will upload a PDF resume during registration.
+    \item The backend will extract PDF text and check it against a predefined keyword list such as Python, C++, Java, SQL, React, ML, AI, DSA, and JavaScript.
+    \item The student will review the extracted suggestions, enter or confirm profile details such as CGPA, GitHub, skills, and professional summary, and create the account.
+    \item Recruiters will log in, create job postings containing role, company, salary/CTC, experience, location, and description, and make those jobs available to students.
+    \item A student will submit an application to a job. The backend will prevent duplicate applications where the underlying database constraint reports an existing duplicate.
+    \item Recruiters will retrieve applicants for their jobs and search active candidates using a database-backed skill-match score, ordered with CGPA as a secondary criterion.
+    \item Placement administrators will monitor student placement records, recruitment statistics, recruiter activity, and audit events.
 \end{enumerate}
 
-\subsection{Operational constraints for an educational, tier-2/3 setting}
+\subsection{Operational constraints for an educational placement setting}
 \begin{itemize}[leftmargin=0.7cm]
-    \item Keep the solution usable on low-to-mid range devices via responsive web design.
-    \item Avoid dependence on advanced research algorithms; focus on workflow, automation, and system correctness.
-    \item Design for deployability using common web hosting and managed databases.
+    \item Keep the web interfaces usable on common desktop and laptop browsers with responsive layouts.
+    \item Keep the resume-processing step lightweight and deterministic; the implementation will be keyword-based rather than a learned resume-classification model.
+    \item Use a managed PostgreSQL-compatible database for persistent storage while exposing the application through HTTP APIs.
+    \item Separate the three stakeholder experiences (student, recruiter, administrator) so that each role sees only the workflow relevant to it at the interface level.
 \end{itemize}
 
-\section{Solution Approach %
-\BvrHint{\ldots Engineering focus}}
-This is an engineering course project, so we focus on scalable administrative and workflow aspects rather than novel algorithm research.
+\section{Solution Approach\BvrHint{\ldots Engineering focus}}
+The project will primarily be a full-stack software engineering and information-management solution. Its value will come from integrating resume text extraction, profile storage, candidate search, job/application workflows, and administrative analytics rather than from introducing a novel machine-learning algorithm.
 
-\subsection{Duplicate/quality assistance %
-\BvrHint{\ldots non-research}}
-Duplicate detection will be heuristic-based:
+\subsection{Resume processing and skill extraction\BvrHint{\ldots implementation-grounded}}
+Building upon the base repository's \texttt{/ai\_parse} endpoint, the system will read an uploaded PDF using PyMuPDF (the \texttt{fitz} package), concatenate page text, and perform case-insensitive substring matching against a fixed list of technical keywords. The endpoint will return \texttt{suggested\_skills} and the first 300 characters as \texttt{bio\_preview}. 
+
+This will be implemented as \textbf{rule-based keyword extraction from PDF text}, not as a trained artificial-intelligence model. A future enhancement could replace the fixed list with NER, embedding-based semantic matching, or a trained classifier, but those techniques are outside the planned initial scope.
+
+\subsection{Web architecture\BvrHint{\ldots API-centered}}
+The planned three-layer architecture includes:
 \begin{itemize}[leftmargin=0.7cm]
-    \item Normalize text (category + short description keywords).
-    \item Use a simple similarity measure (e.g., token overlap / TF-IDF cosine with threshold) without claiming state-of-the-art.
-    \item Show top candidate duplicates to staff for decision; never fully auto-delete or auto-reject.
+    \item \textbf{Frontend:} HTML/CSS/JavaScript pages for the landing page, student registration/workspace, recruiter workspace, login pages, and placement administration.
+    \item \textbf{Backend API:} FastAPI endpoints for resume parsing, student registration/login/update, candidate search, job creation, applications, recruiter onboarding/login, recruiter applicant retrieval, placement updates, statistics, and audit logs.
+    \item \textbf{Database:} PostgreSQL accessed with \texttt{psycopg2}; the schema will include \texttt{students}, \texttt{skills}, and \texttt{student\_skills}, while other endpoints will operate over recruiter, job, application, statistics, candidate-view, and audit-log structures. 
 \end{itemize}
 
-\subsection{Web architecture %
-\BvrHint{\ldots web-based solution}}
-A typical 3-tier web architecture:
+\subsection{API surface}
+The proposed backend will expose role-specific routes including:
 \begin{itemize}[leftmargin=0.7cm]
-    \item \textbf{Frontend:} responsive UI for citizens and staff (status pages, submission form, dashboard).
-    \item \textbf{Backend API:} authentication, complaint submission, status transitions, assignment logic.
-    \item \textbf{Database:} store users, complaints, status history, attachments metadata.
+    \item \texttt{POST /ai\_parse} for resume PDF parsing.
+    \item \texttt{POST /register\_student}, \texttt{POST /login}, and \texttt{POST /update\_profile} for student profile lifecycle management.
+    \item \texttt{GET /recruiter/candidates} for candidate search and match scoring.
+    \item \texttt{POST /recruiter/jobs} and \texttt{GET /jobs} for role publishing and job retrieval.
+    \item \texttt{POST /student/apply/\{job\_id\}} for applications.
+    \item \texttt{GET /recruiter/applicants} for recruiter-specific application review.
+    \item \texttt{POST /admin/add\_recruiter}, \texttt{POST /admin/mark\_placed/\{student\_id\}}, \texttt{GET /admin/stats}, \texttt{GET /admin/all\_students}, and \texttt{GET /admin/audit\_logs} for placement-office operations.
 \end{itemize}
 
-\subsection{CI/CD and fast delivery enabler}
-CI/CD will be used to:
-\begin{itemize}[leftmargin=0.7cm]
-    \item Automatically build and run tests on every change.
-    \item Produce repeatable deployment artifacts to staging.
-    \item Enable safe and frequent releases of incremental features.
-\end{itemize}
+\subsection{Authentication and data handling}
+Student passwords will be hashed using Passlib with bcrypt before storage, while student logins will verify the supplied password against the stored hash. Recruiter authentication will use an email/access-code pair. The backend will also remove the stored student password from the successful student-login response before returning the user object. 
 
-\section{Evaluation Criterion %
-\BvrHint{\ldots measurable and attributable}}
-We define success using measurable metrics tied to the core workflow.
+For deployment, credentials, database connection strings, administrator secrets, and recruiter access codes will be moved to environment-managed secrets rather than being embedded in source code (which is a vulnerability noted in the baseline repository).
+
+\section{Evaluation Criterion\BvrHint{\ldots measurable and attributable}}
+The platform will be evaluated using operational metrics tied to its principal workflows.
 
 \subsection{Primary evaluation metric}
-\textbf{Time-to-acknowledgement (TTA):} time between complaint submission and ``Received/Assigned'' status creation in the system.
+\textbf{Profile onboarding time:} time from the beginning of student registration to creation of a complete student profile.
 \begin{itemize}[leftmargin=0.7cm]
-    \item Target: median TTA $\le$ 2 hours during pilot window.
-    \item Attribution: measured from database timestamps (submission vs. first status update by staff).
+    \item Target: reduce average onboarding time compared with fully manual profile entry.
+    \item Attribution: measure from the registration workflow and successful profile creation timestamps where available.
 \end{itemize}
 
 \subsection{Secondary evaluation metrics}
 \begin{itemize}[leftmargin=0.7cm]
-    \item \textbf{Resolution time reduction:} reduce time-to-resolved compared to baseline process (even if baseline is collected via survey).
-    \item \textbf{Duplicate rate:} percentage of complaints flagged as duplicates and resolved without rework.
-    \item \textbf{User clarity:} citizen-reported clarity of status using a simple 1--5 feedback question.
-    \item \textbf{Reliability:} availability of staging/production for login and submission during business hours (e.g., $\ge$ 99\% uptime in pilot).
+    \item \textbf{Resume extraction usefulness:} percentage of uploaded resumes for which the keyword extractor returns at least one relevant skill.
+    \item \textbf{Candidate-search relevance:} proportion of top-ranked search results judged relevant to the recruiter-entered skill set.
+    \item \textbf{Application processing efficiency:} time required for recruiters to locate and inspect applicants for a role compared with a manual process.
+    \item \textbf{Data completeness:} percentage of student profiles containing CGPA, skills, GitHub profile, and professional summary.
+    \item \textbf{Duplicate-application prevention:} percentage of repeated submissions correctly blocked by the application constraint/error handling.
+    \item \textbf{Administrative visibility:} availability of current student, placement, recruiter, and audit information from the administrative dashboard.
 \end{itemize}
 
-\subsection{Pilot validation plan %
-\BvrHint{\ldots high-level}}
+\subsection{Validation plan\BvrHint{\ldots practical pilot}}
 \begin{itemize}[leftmargin=0.7cm]
-    \item Recruit 10--20 pilot users (citizens) and 3--5 staff roles (department simulation if real staff unavailable).
-    \item Compare metrics before/after within the iteration window by logging baseline estimates via short interviews or existing process observations.
+    \item Use a sample of student resumes representing different formatting styles and technology stacks.
+    \item Ask student testers to register through the complete upload-to-profile workflow and record time, extraction usefulness, and correction effort.
+    \item Ask recruiter testers to publish a role, search candidates by several skill combinations, inspect applicants, and export applicant data.
+    \item Ask placement-office testers to onboard recruiters, inspect statistics, mark a student as placed, and review audit activity.
 \end{itemize}
 
-\section{Scalability %
-\BvrHint{\ldots with foresight}}
-The proposition should scale in both theoretical and practical senses.
+\section{Scalability\BvrHint{\ldots with foresight}}
+While the planned API will provide a solid foundation, several improvements will be scoped for scalable deployment:
 
 \begin{enumerate}[leftmargin=0.7cm]
-    \item \textbf{Scalable (theoretically):} The system should support growth in number of complaints and concurrent dashboard usage by:
+    \item \textbf{Scalable (theoretically):} support growth in candidate and application volume through:
     \begin{itemize}[leftmargin=0.7cm]
-        \item decoupling components (frontend/backend),
-        \item enabling pagination and indexing for common queries,
-        \item using stateless API design.
+        \item database indexing on commonly searched fields,
+        \item pagination for student, job, and applicant queries,
+        \item connection pooling and resilient database handling,
+        \item stateless API instances behind a load balancer, and
+        \item caching for frequently requested public job data and aggregate statistics.
     \end{itemize}
-    
-    \item \textbf{Operationally deployable (practically):} The system should run on common web hosting:
-    \begin{itemize}[leftmargin=0.7cm]
-        \item managed database,
-        \item containerized or platform-hosted deployment,
-        \item CI/CD pipeline for staging/production.
-    \end{itemize}
+
+    \item \textbf{Search quality (practically):} evolve from fixed keyword matching toward normalized skill taxonomies and semantic matching so that related skills and spelling variants can be handled consistently.
+
+    \item \textbf{Operational deployment:} separate frontend and backend deployment, use managed PostgreSQL, keep secrets outside source control, and add automated testing and deployment checks.
 \end{enumerate}
 
 \section{Engine availability heuristic}
-A mature set of ``engines'' (tooling/services) is available to implement this as a web-based project:
+The studied repository demonstrates that a mature-enough stack exists to successfully build this system for a student-scale deployment. We will utilize:
 \begin{itemize}[leftmargin=0.7cm]
-    \item Web framework for REST APIs and templated/reactive pages.
-    \item Managed relational or document database.
-    \item Authentication approach (token-based or session-based).
-    \item Object storage for optional attachments (or local storage for pilot).
-    \item Test framework for unit/integration tests.
-    \item CI runner and staging deployment target.
+    \item \textbf{FastAPI + Uvicorn:} HTTP API layer and development/application server.
+    \item \textbf{PyMuPDF:} PDF text extraction for resume uploads.
+    \item \textbf{Passlib + bcrypt:} password hashing and verification for student accounts.
+    \item \textbf{PostgreSQL + psycopg2:} relational persistence and SQL access.
+    \item \textbf{HTML/CSS/JavaScript:} lightweight stakeholder-facing web interfaces.
+    \item \textbf{Vercel/Render-style deployment:} hosting configuration for continuous delivery.
 \end{itemize}
-We will use these mature components to focus on workflow design, correctness, and measurement rather than inventing new infrastructure.
 
-\section{Project scope and deliverables %
-\BvrHint{\ldots iteration-friendly}}
-\subsection{Initial deliverable %
-\BvrHint{\ldots first iteration}}
+\section{Project scope and deliverables\BvrHint{\ldots iteration-friendly}}
+\subsection{Initial deliverable\BvrHint{\ldots first iteration}}
 \begin{itemize}[leftmargin=0.7cm]
-    \item Citizen submission form + complaint ID generation
-    \item Staff workflow: update status and assignment
-    \item Citizen status page: view timeline/history
-    \item Basic logging and timestamps for TTA measurement
-    \item CI: build + backend unit tests + linting
-    \item CD to staging with a single command or pipeline job
+    \item Student registration and login with relational profile storage.
+    \item PDF resume upload with rule-based skill extraction and bio preview.
+    \item Student profile editing for CGPA and skills.
+    \item Recruiter login and role creation.
+    \item Public/Student job listing and job application submission.
+    \item Recruiter applicant inbox and skill-based candidate search.
+    \item Placement-office dashboard with student records and placement status.
 \end{itemize}
 
 \subsection{Subsequent deliverables}
 \begin{itemize}[leftmargin=0.7cm]
-    \item Lightweight duplicate suggestions with staff review
-    \item Notification layer (email/SMS optional in later iteration; can start with in-app notifications)
-    \item Admin dashboard for metrics and backlog
-    \item Improved search/filtering and indexed queries for scale readiness
+    \item Replace fixed keyword extraction with normalized skill matching or semantic NLP.
+    \item Add explicit application-status transitions such as shortlisted, interview, selected, and rejected.
+    \item Add stronger role-based authorization and session/token management.
+    \item Add automated unit/integration tests and CI/CD quality gates.
+    \item Improve audit coverage so important recruiter and student changes are traceable.
+    \item Add analytics for conversion rates, source of applicants, skill demand, and placement outcomes.
 \end{itemize}
 
 \section{Risks and mitigations}
 \begin{itemize}[leftmargin=0.7cm]
-    \item \textbf{Data privacy / consent:} minimize collected data; keep attachments optional; store only what is needed.
-    \item \textbf{Staff adoption:} provide an easy UI for status updates; keep workflow steps minimal; include shortcuts.
-    \item \textbf{Evaluation measurement ambiguity:} instrument timestamps and define clear status transitions before development begins.
-    \item \textbf{Operational issues in pilot:} use staging early; ensure CI/CD produces repeatable deployments.
+    \item \textbf{Credential exposure:} We will migrate all database credentials, administrator secrets, and access codes to environment-managed secrets to avoid hardcoding them into source control.
+    \item \textbf{Weak resume interpretation:} Fixed substring matching can miss synonyms, variants, and contextual meaning; we will introduce normalization and semantic models in a later iteration.
+    \item \textbf{Authorization gaps:} We will replace simple credential checks with robust role-based authorization and expiring sessions/tokens.
+    \item \textbf{Data quality:} We will validate profile fields and normalize skills to reduce duplicates and inconsistent spellings.
+    \item \textbf{Scale and reliability:} We will add pagination, indexes, connection pooling, monitoring, and automated tests before handling a large placement cohort.
 \end{itemize}
 
 \section{Summary}
-This project proposes a deployable web platform to reduce grievance handling delays in a tier-2/3 city context. It meets the course criteria by emphasizing time-to-value through rapid iterations, implementing CI/CD to support frequent safe releases, and using measurable evaluation criteria (especially time-to-acknowledgement). It remains focused on engineering workflow and scalability readiness rather than research-driven novelty.
+This project proposes to build a deployable campus placement platform that combines resume-assisted student onboarding with recruiter and placement-office workflows. The proposed implementation will be grounded in FastAPI, PostgreSQL, PyMuPDF, bcrypt-based password hashing, and role-specific web interfaces. While the initial resume feature will act as a lightweight keyword-extraction mechanism rather than a learned AI screener, its broader engineering value will come from successfully integrating candidate search, job posting, applications, recruiter management, placement statistics, and audit activity into a single unified system.
 
 \end{document}
